@@ -1,0 +1,17 @@
+{
+  "name": "ember-field-mixin",
+  "version": "0.1.0",
+  "homepage": "https://github.com/billysbilling/ember-field-mixin",
+  "main": "src/js/field-mixin.js",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "ember": "billysbilling/bower-ember#master"
+  }
+}

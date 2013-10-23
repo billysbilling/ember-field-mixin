@@ -1,0 +1,8 @@
+{
+  "name": "ember-field-mixin",
+  "version": "0.0.1",
+  "devDependencies": {
+    "grunt": "~0.4.1",
+    "billy-builder": "git://github.com/billysbilling/billy-builder.git"
+  }
+}
