@@ -12,6 +12,7 @@
     "tests"
   ],
   "dependencies": {
-    "ember": "billysbilling/bower-ember#master"
+    "ember": "billysbilling/bower-ember#master",
+    "which-transition-event": "billysbilling/which-transition-event#master"
   }
 }
