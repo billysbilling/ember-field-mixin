@@ -1,4 +1,4 @@
-var whichTransitionEvent = require('../../../../src/js/utils/which-transition-event');
+var whichTransitionEvent = require('which-transition-event');
 
 module.exports = Em.Mixin.create({
     classNameBindings: ['error:has-error'],
