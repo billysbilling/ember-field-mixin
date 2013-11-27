@@ -1,16 +1,17 @@
-var whichTransitionEvent = require('which-transition-event');
+var whichTransitionEvent = require('which-transition-event'),
+    firstErrorField = null;
 
 module.exports = Em.Mixin.create({
     classNameBindings: ['error:has-error'],
-    
+
     value: null,
-    
+
     record: null,
-    
+
     name: null,
 
     error: null,
-    
+
     hasFocus: null,
 
     valueDidChange: function() {
@@ -22,7 +23,7 @@ module.exports = Em.Mixin.create({
             record.set('error', null);
         }
     }.observes('value'),
-    
+
     setupErrorMouseEvents: function() {
         var self = this;
         this.$()
@@ -58,21 +59,47 @@ module.exports = Em.Mixin.create({
 
     highlightError: function() {
         if (this.get('record.errors.'+this.get('name'))) {
-            var el = this.$();
+            var el = this.$(),
+                y = el.offset().top,
+                x = el.offset().left,
+                first$ = firstErrorField ? firstErrorField.$() : null,
+                firstY = first$ ? first$.offset().top : null,
+                firstX = first$ ? first$.offset().left : null;
             el.addClass('has-error-highlight');
             el.one(whichTransitionEvent(), function() {
                 el.removeClass('has-error-highlight');
             });
+            if (!firstErrorField) {
+                firstErrorField = this;
+            } else if (y === firstY && x < firstX) {
+                firstErrorField = this;
+            } else if (y < firstY) {
+                firstErrorField = this;
+            }
+            if (firstErrorField) {
+                Em.run.scheduleOnce('afterRender', this, this.showErrorFieldsTooltip);
+            }
         }
     },
-    
+
+    willDestroy: function() {
+        this.container.lookup('util:tooltip').hide();
+    },
+
+    showErrorFieldsTooltip: function() {
+        if (firstErrorField && !firstErrorField.get('isDestroying')) {
+            firstErrorField.showErrorTooltip();
+        }
+        firstErrorField = null;
+    },
+
     errorDidChange: function() {
         var error = this.get('error');
         if (!error) {
             this.container.lookup('util:tooltip').hide();
         }
     }.observes('error'),
-    
+
     hasFocusDidChange: function() {
         if (this.get('hasFocus') && this.get('error')) {
             this.showErrorTooltip(false);
