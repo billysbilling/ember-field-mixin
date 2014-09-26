@@ -84,6 +84,8 @@ module.exports = Em.Mixin.create({
 
     willDestroy: function() {
         this.container.lookup('util:tooltip').hide();
+
+        this.recordWillChange();
     },
 
     showErrorFieldsTooltip: function() {
