@@ -12,15 +12,36 @@ module.exports = Em.Mixin.create({
 
     error: null,
 
+    formattedError: function() {
+        var error = this.get('error');
+        if (Array.isArray(error)) {
+            //Ember Data
+            error = error
+                .map(function(e) {
+                    return e.message;
+                })
+                .join(' ');
+        }
+        return error;
+    }.property('error'),
+
     hasFocus: null,
 
     valueDidChange: function() {
         var record = this.get('record');
         if (record && !record.get('isDestroyed')) {
-            if (record.get('errors')) {
-                record.set('errors.'+this.get('name'), null);
+            var errors = record.get('errors')
+            if (errors) {
+                var name = this.get('name')
+                if (errors instanceof DS.Errors) {
+                    //Ember Data
+                    errors.remove(name)
+                } else {
+                    //Billy Data
+                    record.set('errors.'+name, null);
+                    record.set('error', null);
+                }
             }
-            record.set('error', null);
         }
     }.observes('value'),
 
@@ -42,7 +63,13 @@ module.exports = Em.Mixin.create({
     recordWillChange: function() {
         var r = this.get('record');
         if (r) {
-            r.off('didValidate', this, this.highlightError);
+            if (r instanceof DS.Model) {
+                //Ember Data
+                r.off('becameInvalid', this, this.highlightError);
+            } else {
+                //Billy Data
+                r.off('didValidate', this, this.highlightError);
+            }
             this._recordValueBinding.disconnect(this);
             this._recordErrorBinding.disconnect(this);
         }
@@ -51,9 +78,17 @@ module.exports = Em.Mixin.create({
     recordDidChange: function() {
         var r = this.get('record');
         if (r) {
-            r.on('didValidate', this, this.highlightError);
             this._recordValueBinding = this.bind('value', 'record.'+ this.get('name'));
-            this._recordErrorBinding = this.bind('error', 'record.errors.'+this.get('name'));
+            if (r instanceof DS.Model) {
+                //Ember Data
+                r.on('becameInvalid', this, this.highlightError);
+                this._recordErrorBinding = Em.oneWay(this, 'error', 'record.errors.'+this.get('name'));
+            } else {
+                //Billy Data
+                r.on('didValidate', this, this.highlightError);
+                this._recordErrorBinding = this.bind('error', 'record.errors.'+this.get('name'));
+            }
+
         }
     }.observes('record').on('init'),
 
@@ -111,6 +146,6 @@ module.exports = Em.Mixin.create({
     }.observes('hasFocus'),
 
     showErrorTooltip: function(scheduled) {
-        this.container.lookup('util:tooltip')[scheduled ? 'scheduleShow' : 'show'](this, this.get('error'), 'topLeft');
+        this.container.lookup('util:tooltip')[scheduled ? 'scheduleShow' : 'show'](this, this.get('formattedError'), 'topLeft');
     }
 });
