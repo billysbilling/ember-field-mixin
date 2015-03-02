@@ -33,7 +33,7 @@ module.exports = Em.Mixin.create({
             var errors = record.get('errors')
             if (errors) {
                 var name = this.get('name')
-                if (errors instanceof DS.Errors) {
+                if (typeof window.DS !== 'undefined' && errors instanceof DS.Errors) {
                     //Ember Data
                     errors.remove(name)
                 } else {
@@ -63,7 +63,7 @@ module.exports = Em.Mixin.create({
     recordWillChange: function() {
         var r = this.get('record');
         if (r) {
-            if (r instanceof DS.Model) {
+            if (typeof window.DS !== 'undefined' && r instanceof DS.Model) {
                 //Ember Data
                 r.off('becameInvalid', this, this.highlightError);
             } else {
@@ -79,7 +79,7 @@ module.exports = Em.Mixin.create({
         var r = this.get('record');
         if (r) {
             this._recordValueBinding = this.bind('value', 'record.'+ this.get('name'));
-            if (r instanceof DS.Model) {
+            if (typeof window.DS !== 'undefined' && r instanceof DS.Model) {
                 //Ember Data
                 r.on('becameInvalid', this, this.highlightError);
                 this._recordErrorBinding = Em.oneWay(this, 'error', 'record.errors.'+this.get('name'));
