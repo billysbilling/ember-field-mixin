@@ -1,6 +1,6 @@
 {
   "name": "ember-field-mixin",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "homepage": "https://github.com/billysbilling/ember-field-mixin",
   "main": "src/js/field-mixin.js",
   "license": "MIT",
